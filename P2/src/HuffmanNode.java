@@ -5,7 +5,7 @@ public class HuffmanNode {
 	public HuffmanNode next;
 	public HuffmanNode left;
 	public HuffmanNode right;
-	
+
 	public HuffmanNode(byte b, int c) {
 		count = c;
 		this.b = b;

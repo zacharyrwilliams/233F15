@@ -1,24 +1,29 @@
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.Arrays;
 
 public class ByteCounter {
-	private ArrayList<Byte> list = new ArrayList<Byte>();
-	private ArrayList<Integer> count = new ArrayList<Integer>();
-	private int[] orders; //holds either the ordering for the list array or count array, depending on which is sorted
-	private String outputOrdering;
+	private ArrayList<HuffmanNode> list = new ArrayList<HuffmanNode>();
+	private Order order = Order.byByte;
 	
 	public ByteCounter(byte[] input) {
-		for(byte value : input) {			
-			if(list.contains(value)) {
-				int index = list.indexOf(value);
-				count.set(index, count.get(index)+1);
+		ArrayList<Byte> bytes = new ArrayList<Byte>();
+		ArrayList<Integer> counts = new ArrayList<Integer>();
+		
+		//Create list of present bytes, list of counts
+		for(byte value : input) {	
+			if(bytes.contains(value)) {
+				int index = bytes.indexOf(value);
+				counts.set(index, counts.get(index)+1);
 			}
 			else {
-				list.add(value);
+				bytes.add(value);
 			}			
 		}
-		
-		orders = new int[list.size()];
+		//Create the list I actually want to use- the list of HuffmanNodes
+		for(int i=0; i < counts.size(); i++) {
+			list.add(new HuffmanNode(bytes.get(i), counts.get(i)));
+		}
 	}
 	
 	public ByteCounter(String fileName) throws FileNotFoundException {
@@ -26,104 +31,63 @@ public class ByteCounter {
 	}
 	
 	public int getCount(byte b) {
-		if(list.contains(b)) {
-			return count.get(list.indexOf(b));
+		for(HuffmanNode node : list) {
+			if(node.b == b) {
+				return node.count;
+			}			
 		}
-		
 		return 0;
 	}
 	
 	public int[] getCount(byte[] b) {
-		int[] array = new int[count.size()];
+		int[] counts = new int[list.size()];
 		
-		for(int i = 0; i < array.length; i++) {
-			array[i] = count.get(i);
+		for(int i=0; i < counts.length; i++) {
+			counts[i] = getCount(b[i]);
+		}
+		return counts;
+	}
+	
+	public byte[] getElements() {
+		byte[] array = new byte[list.size()];
+		for(int i=0; i < array.length; i++) {
+			array[i] = list.get(i).b;
 		}
 		
 		return array;
 	}
 	
-	public byte[] getElements() {
-		byte[] array = new byte[list.size()];
-	
-		for(int i = 0; i < array.length; i++) {
-		array[i] = list.get(i);
-		}
-	
-	return array;
-	}
-	
-	public void sort(String order) {
-		if(order.equals("byte")) {
-			byte x;  
-			for(int i = 0; i < list.size(); i++) {
-				int j = i;			   
-				while(j>0 && list.get(j-1) > list.get(j)) {
-					x = list.get(j);
-					list.set(j,  list.get(j-1));
-					list.set(j-1, x);
-					j--;
-			    	}
-				orders[i] = j;
-				}  
-			}
-		else if(order.equals("countInc")) {
-			int x;  
-			for(int i = 0; i < count.size(); i++) {
-				int j = i;			   
-				while(j>0 && count.get(j-1) > count.get(j)) {
-					x = count.get(j);
-					count.set(j,  count.get(j-1));
-					count.set(j-1, x);
-					j--;
-			    	}
-				orders[i] = j;
-				}  
-			}
-			
-		else if(order.equals("countDec")) {
-			int x;  
-			for(int i = 0; i < count.size(); i++) {
-				int j = i;			   
-				while(j>0 && count.get(j-1) < count.get(j)) {
-					x = count.get(j);
-					count.set(j,  count.get(j-1));
-					count.set(j-1, x);
-					j--;
-			    }
-				orders[i] = j;
-			}
-		}
-	}
 		
 	public void setOrder(String order) {
-		outputOrdering = order;
+		switch(order) {
+			case "byte":
+				this.order = Order.byByte;
+				
+			case "countInc":
+				this.order = Order.countInc;
+				
+			case "countDec":
+				this.order = Order.countDec;
+				
+			default:
+				throw new IllegalArgumentException();
+		}
 	}
 	
 	public String toString() {//Returns in format of byte:count
 		StringBuilder builder = new StringBuilder();
-		sort(outputOrdering);
+		Arrays.sort(list.toArray(new HuffmanNode[list.size()]), new HuffmanNodeComparator(order));
 		
-		if(outputOrdering.equals("byte")) {
-			for(int i = 0; i < list.size()-1; i++) {
-				builder.append(list.get(i).toString() + ":" + count.get(orders[i]).toString() + " ");
-			}
-			builder.append(list.get(list.size()).toString() + ":" + count.get(orders[list.size()]).toString());
-		}
-		else if(outputOrdering.equals("countInc") || outputOrdering.equals("countDec")) {
-			for(int i = 0; i < list.size()-1; i++) {
-				builder.append(list.get(orders[i]).toString() + ":" + count.get(i).toString() + " ");
-			}
-			builder.append(list.get(orders[list.size()]).toString() + ":" + count.get(list.size()).toString());
-		}
-		else {
-			return "Something went wrong either in .toString() or in .setOrder()";
+		//Need to check sign-age of bytes
+		for(HuffmanNode item : list) {
+			builder.append(item.b + ":" + item.count + " ");
 		}
 		
-		return builder.toString();
+		return builder.toString().trim();
 	}
 	
 	public String toString(String format) {
-		return null;
+		setOrder(format);
+		return toString();
 	}
 }
