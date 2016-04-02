@@ -1,9 +1,9 @@
-These are the projects done for EECS233 - Data Structures.
+This repository holds my three projects for EECS233 - Data Structures from the Fall 2015 semester.
 
-The zero-th project is literally just FizzBuzz, speaking of which, I'm not sure I saved into this folder yet, which I should do at some point. But it's FizzBuzz anyway, so it's not like anyone will care.
+Project 1 was to implement the List data structure.
 
-The first project is an implementation of ArrayList and LinkedList.
+Project 2 was to make a text compression program using Huffman encoding.
 
-The second project is an implementation of the Huffman's coding algorithm for a compression program.
+Project 3 was to write an 8-puzzle solver using DFS and BFS.
 
-The third and fourth projects have not yet been assigned.
+My project 2 does not correctly compress files. 
