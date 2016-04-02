@@ -1,8 +1,7 @@
 public class HuffmanNode {
 	public byte b;
 	public int count;
-	public boolean[] code;	
-	public HuffmanNode next;
+	public boolean[] code;
 	public HuffmanNode left;
 	public HuffmanNode right;
 
